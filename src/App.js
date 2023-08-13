@@ -73,19 +73,30 @@ export default function App() {
 
   useEffect(
     function () {
+      handleCloseMovie()
+    },
+    [query]
+  )
+
+  useEffect(
+    function () {
+      const controller = new AbortController()
       async function fetchMovies() {
         try {
           setIsLoading(true)
           setError("")
-          const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=${query}`)
+          const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=${query}`, { signal: controller.signal })
           if (!res.ok) throw new Error("Something went wrong.")
           const data = await res.json()
           if (data.Response === "False") throw new Error("Movie not found")
 
           setMovies(data.Search)
+          setError("")
         } catch (error) {
           console.log(error)
-          setError(error.message)
+          if (error.name !== "AbortError") {
+            setError(error.message)
+          }
         } finally {
           setIsLoading(false)
         }
@@ -97,6 +108,10 @@ export default function App() {
       }
 
       fetchMovies()
+
+      return function () {
+        controller.abort()
+      }
     },
     [query]
   )
@@ -237,6 +252,23 @@ function MovieDetails({ selectedId, onCloseMovie, watched, onAddWatched }) {
 
   useEffect(
     function () {
+      function callBack(e) {
+        if (e.keyCode === 27) {
+          console.log("press")
+          onCloseMovie()
+        }
+      }
+      document.addEventListener("keydown", callBack)
+
+      return function () {
+        document.removeEventListener("keydown", callBack)
+      }
+    },
+    [onCloseMovie]
+  )
+
+  useEffect(
+    function () {
       async function getMovieDetails() {
         try {
           setIsLoading(true)
@@ -253,6 +285,18 @@ function MovieDetails({ selectedId, onCloseMovie, watched, onAddWatched }) {
       getMovieDetails()
     },
     [selectedId]
+  )
+
+  useEffect(
+    function () {
+      if (!title) return
+      document.title = `MOVIE: ${title}`
+
+      return function () {
+        document.title = "usePopcorn"
+      }
+    },
+    [title]
   )
   return (
     <div className="details">
