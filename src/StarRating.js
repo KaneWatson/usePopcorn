@@ -33,13 +33,14 @@ export default function StarRating({ maxRating = 5, color = "#fcc419", size = 48
 
   function handleRating(rating) {
     setRating(rating)
+    onSetRating(rating)
   }
 
   return (
     <div style={containerStyle} className={className}>
       <div style={starContainerStyle}>
         {Array.from({ length: maxRating }, (_, i) => (
-          <Star key={i} i={i} rating={rating} color={color} size={size} onRate={() => handleRating(i + 1)} full={tempRating ? tempRating >= i + 1 : rating >= i + 1} onHoverIn={() => setTempRating(i + 1)} onHoverOut={() => setTempRating(0)} />
+          <Star key={i} rating={rating} color={color} size={size} onRate={() => handleRating(i + 1)} full={tempRating ? tempRating >= i + 1 : rating >= i + 1} onHoverIn={() => setTempRating(i + 1)} onHoverOut={() => setTempRating(0)} />
         ))}
       </div>
       <p style={textStyle}>{messages.length === maxRating ? messages[tempRating ? tempRating - 1 : rating - 1] : tempRating || rating || ""}</p>
