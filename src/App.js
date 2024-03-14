@@ -6,8 +6,6 @@ import { useKey } from "./useKey"
 
 const average = arr => arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0)
 
-const KEY = "9d8b46a0"
-
 export default function App() {
   const [query, setQuery] = useState("")
   const [selectedId, setSelectedId] = useState("")
@@ -201,7 +199,8 @@ function MovieDetails({ selectedId, onCloseMovie, watched, onAddWatched }) {
       async function getMovieDetails() {
         try {
           setIsLoading(true)
-          const res = await fetch(`https://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`)
+
+          const res = await fetch(`https://www.omdbapi.com/?apikey=${process.env.REACT_APP_API_KEY}&i=${selectedId}`)
           if (!res.ok) throw new Error("Something went wrong, please try again")
           const data = await res.json()
           setMovie(data)
